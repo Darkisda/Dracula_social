@@ -1,9 +1,11 @@
 import { Schema, model, Document } from 'mongoose'
+import { hash } from 'bcryptjs'
 
 interface UserInterface extends Document {
-    email?: string,
-    firstName?: string,
+    email: string,
+    firstName: string,
     lastName?: string,
+    password: string
     fullName(): string,
 }
 
@@ -28,6 +30,14 @@ const UserSchema = new Schema({
     }
 }, {
     timestamps: true
+})
+
+UserSchema.pre<UserInterface>('save', async function(next){
+    const hashPassword = await hash(this.password, 10)
+    
+    this.password = hashPassword
+
+    next()
 })
 
 UserSchema.methods.fullName = function():string {
