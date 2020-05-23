@@ -8,9 +8,24 @@ interface UserInterface extends Document {
 }
 
 const UserSchema = new Schema({
-    email: String,
-    firstName: String,
-    lastName: String,
+    email: {
+        type: String,
+        required: true,
+        lowercase: true,
+    },
+    firstName: {
+        type: String,
+        required: true,
+    },
+    lastName: {
+        type: String,
+        required: false,
+    },
+    password: {
+        type: String,
+        required: true,
+        select: false,
+    }
 }, {
     timestamps: true
 })
