@@ -3,6 +3,7 @@ import cors from 'cors'
 import mongoose from 'mongoose'
 
 import routes from './routes'
+import Auth from './middlewares/Auth'
 
 class App {
     public express: express.Application
@@ -18,6 +19,7 @@ class App {
     private middlewares() {
         this.express.use(express.json())
         this.express.use(cors())
+        this.express.use(Auth.auth)
     }
 
     private database() {

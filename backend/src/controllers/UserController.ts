@@ -1,9 +1,13 @@
 import { Request, Response } from 'express'
-import {compare} from 'bcryptjs'
+import { compare } from 'bcryptjs'
+import { sign } from 'jsonwebtoken'
 
 import User from '../schemas/User'
 
+import { secret } from '../config/auth.json'
+
 class UserController {
+        
     public async index(request: Request, response: Response) {
         const users = await User.find()
 
@@ -16,17 +20,24 @@ class UserController {
 
         try {
             if(await User.findOne({email})) {
-                return response.status(400).send({error: 'User already exists'})
+                return response.status(400).json({error: 'User already exists'})
             }
             const user = await User.create(request.body)
 
             user.password = undefined
 
-            return response.json(user)
+            const token = sign({id: user.id}, secret, {
+                expiresIn: 86400,
+            })
+
+            return response.json({
+                user,
+                token
+            })
 
         } catch (error) {
             
-            return response.status(400).send({error: 'Registration failed'})
+            return response.status(400).json({error: 'Registration failed'})
 
         }
     }
@@ -37,16 +48,23 @@ class UserController {
         const user = await User.findOne({email}).select('+password')
 
         if(!user){
-            return response.status(400).send({error: 'User not found'})
+            return response.status(400).json({error: 'User not found'})
         }
 
         if(!await compare(password, user.password)) {
-            return response.status(400).send({error: 'Invalid password'})
+            return response.status(400).json({error: 'Invalid password'})
         }
 
         user.password = undefined
 
-        response.json(user)
+        const token = sign({id: user.id}, secret, {
+            expiresIn: 86400,
+        })
+
+        response.json({
+            user,
+            token
+        })
     }
 }
 
