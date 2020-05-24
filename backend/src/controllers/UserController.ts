@@ -16,6 +16,8 @@ class UserController {
 
     public async create(request: Request, response: Response) {
         
+        console.log(request.body)
+
         const {email} = request.body
 
         try {

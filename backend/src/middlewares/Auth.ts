@@ -4,14 +4,6 @@ import { promisify } from 'util'
 
 import {secret} from '../config/auth.json'
 
-/**interface UserToken extends Document {
-    email: string,
-    firstName: string,
-    lastName?: string,
-    password: string,
-    id: number,
-}**/
-
 class Auth {
     public async auth(request: Request, response: Response, next: NextFunction) {
         
