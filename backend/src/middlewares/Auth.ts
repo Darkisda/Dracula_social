@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { verify } from 'jsonwebtoken'
-import { promisify } from 'util'
+
+import User from '../schemas/User'
 
 import {secret} from '../config/auth.json'
 
@@ -15,20 +16,23 @@ class Auth {
 
         const parts = authHeader.split(' ')
 
-        if(parts.length !== 2) {
+        if(!(parts.length === 2)) {
             return response.status(401).json({ error: 'Token error' })
         }
 
         const [ scheme, token ] = parts
 
-        if(!/^Bearer$^/i.test(scheme)){
+        if(!(scheme === 'Bearer')){
             return response.status(401).json({ error: 'Token malformatted' })
         }
 
-        verify(token, secret, (err)=> {
+        verify(token, secret, (err, decoded)=> {
+            
             if(err) {
                 return response.status(401).send({error: 'Token Invalid'})
             }
+
+            request.userId = decoded.id
 
             return next()
         })

@@ -7,7 +7,7 @@ import User from '../schemas/User'
 import { secret } from '../config/auth.json'
 
 class UserController {
-        
+
     public async index(request: Request, response: Response) {
         const users = await User.find()
 
@@ -15,8 +15,6 @@ class UserController {
     }
 
     public async create(request: Request, response: Response) {
-        
-        console.log(request.body)
 
         const {email} = request.body
 
@@ -24,6 +22,7 @@ class UserController {
             if(await User.findOne({email})) {
                 return response.status(400).json({error: 'User already exists'})
             }
+
             const user = await User.create(request.body)
 
             user.password = undefined

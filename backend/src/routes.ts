@@ -10,7 +10,7 @@ routes.post('/register', UserController.create)
 
 
 
-//routes.use(Auth.auth)
+routes.use(Auth.auth)
 //Authentication routes
 routes.post('/login', UserController.authenticate)
 
