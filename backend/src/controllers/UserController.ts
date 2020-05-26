@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken'
+import {randomBytes} from 'crypto'
 
 import User from '../schemas/User'
 
@@ -66,6 +67,35 @@ class UserController {
             user,
             token
         })
+    }
+
+    public async forgotPassword(request: Request, response: Response) {
+        const { email } = request.body
+
+        try {
+            const user = await User.findOne({email})
+            
+            if(!user) {
+                return response.status(400).json({error: 'User not found'})
+            }
+
+            const token = randomBytes(20).toString('hex')
+
+            const now = new Date()
+            now.setHours(now.getHours() + 1)
+
+            await User.findOneAndUpdate(user.id, {
+                '$set': {
+                    passwordResetToken: token,
+                    passwordResetExpires: now,
+                }
+            })
+
+            console.log(token, now)
+
+        } catch (err) {
+            response.status(400).json({error: 'Erro on forgot password, try again'})
+        }
     }
 }
 

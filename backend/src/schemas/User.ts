@@ -6,6 +6,8 @@ interface UserInterface extends Document {
     firstName: string,
     lastName?: string,
     password: string,
+    passwordResetToken: string,
+    passwordResetExpires: Date,
     fullName(): string,
 }
 
@@ -27,6 +29,14 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         select: false,
+    },
+    passwordResetToken: {
+        type: String,
+        select: false,
+    },
+    passwordResetExpires: {
+        type: Date,
+        select: false
     }
 }, {
     timestamps: true
