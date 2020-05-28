@@ -32,11 +32,11 @@ const UserSchema = new Schema({
     },
     passwordResetToken: {
         type: String,
-        select: true,
+        select: false,
     },
     passwordResetExpires: {
         type: Date,
-        select: true
+        select: false,
     }
 }, {
     timestamps: true

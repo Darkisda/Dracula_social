@@ -1,4 +1,4 @@
-import e, { Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken'
 import { randomBytes } from 'crypto'
@@ -85,18 +85,10 @@ class UserController {
             const now = new Date()
             now.setHours(now.getHours() + 1)
 
-
-            console.log(token)
-            console.log(user.id)
-            console.log(now)
-
-            await User.findOneAndUpdate(user.id, {
+            await User.findByIdAndUpdate(user.id, {
                 $set: {
                     passwordResetToken: token,
                     passwordResetExpires: now,
-                },
-                $currentDate: {
-                    lastModified: true
                 }
             }, {new: true})
 
@@ -131,8 +123,6 @@ class UserController {
             if(!user) {
                 return response.status(400).json({error: 'User not found'})
             }
-
-            console.log(user.passwordResetToken)
 
             if(token !== user.passwordResetToken){
                 return response.status(400).json({error: 'Password Token invalid'})
