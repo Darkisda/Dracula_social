@@ -1,8 +1,9 @@
-import { Request, Response } from 'express'
+import e, { Request, Response } from 'express'
 import { compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken'
-import {randomBytes} from 'crypto'
+import { randomBytes } from 'crypto'
 
+import transport from '../modules/mailer'
 import User from '../schemas/User'
 
 import { secret } from '../config/auth.json'
@@ -84,17 +85,73 @@ class UserController {
             const now = new Date()
             now.setHours(now.getHours() + 1)
 
+
+            console.log(token)
+            console.log(user.id)
+            console.log(now)
+
             await User.findOneAndUpdate(user.id, {
-                '$set': {
+                $set: {
                     passwordResetToken: token,
                     passwordResetExpires: now,
+                },
+                $currentDate: {
+                    lastModified: true
                 }
+            }, {new: true})
+
+            transport.sendMail({
+                
+                to: email,
+                from: 'luandesouzanascimento2011@gmail.com', 
+                template: 'auth/forgot_password',
+                context: {token},
+
+            }, (err, info)=> {
+
+                if(err) {
+                    return response.status(400).json({error: 'Cannot send forgot password email'})
+                }
+
+                response.json({message: 'Check you email'})
             })
 
-            console.log(token, now)
-
         } catch (err) {
-            response.status(400).json({error: 'Erro on forgot password, try again'})
+
+            response.status(400).json({error: 'Error on forgot password, try again'})
+        }
+    }
+
+    public async resetPassword(request: Request, response: Response) {
+        const {email, token, password} = request.body
+
+        try {
+            const user = await User.findOne({email}).select('+passwordResetToken passwordResetExpires')
+
+            if(!user) {
+                return response.status(400).json({error: 'User not found'})
+            }
+
+            console.log(user.passwordResetToken)
+
+            if(token !== user.passwordResetToken){
+                return response.status(400).json({error: 'Password Token invalid'})
+            }
+
+            const now = new Date()
+
+            if(now > user.passwordResetExpires){
+                return response.status(400).json({error: 'Token expired, generate a new one'})
+            }
+
+            user.password = password
+
+            await user.save()
+
+            response.json({message: 'okay'})
+
+        } catch (error) {
+            return response.status(400).json({error: 'Cannot reset password, try again'})
         }
     }
 }

@@ -24,6 +24,7 @@ class App {
         mongoose.connect('mongodb://localhost:27017/tsnode', {
             useNewUrlParser: true,
             useUnifiedTopology: true,
+            useFindAndModify: false,
         })
     }
 

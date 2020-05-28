@@ -1,22 +1,27 @@
 import { createTransport } from 'nodemailer'
-import path from 'path'
+import {resolve} from 'path'
 
 const hbs = require('nodemailer-express-handlebars')
 
 import {host, pass, port, user} from '../config/mail.json'
 
 const transport = createTransport({
-    host,
-    port,
+    host: host,
+    port: port,
     auth: {
-        user,
-        pass
+        user: user,
+        pass: pass
   }
 })
 
 transport.use('compile', hbs({
-    viewEngine: 'handlebars',
-    viewPath: path.resolve('./src/resources/mail/'),
+    viewEngine: {
+        extName: '.hbs',
+        partialsDir: resolve('./src/resources/mail/auth/'),
+        layoutsDir: resolve('./src/resources/mail/auth/'),
+        defaultLayout: ''
+    },
+    viewPath: resolve('./src/resources/mail/'),
     extName: '.html',
 }))
 

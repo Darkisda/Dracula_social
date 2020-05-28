@@ -7,13 +7,13 @@ const routes = Router()
 
 routes.get('/users', UserController.index)
 routes.post('/register', UserController.create)
-
+routes.post('/forgotPassword', UserController.forgotPassword)
+routes.post('/resetPassword', UserController.resetPassword)
 
 
 routes.use(Auth.auth)
 //Authentication routes
 routes.post('/login', UserController.authenticate)
-routes.post('/forgotPassword', UserController.forgotPassword)
 
 
 export default routes
